@@ -9,7 +9,14 @@ import { AppProps } from 'next/app';
 import { NextPage } from 'next';
 import { wrapper } from '../store';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { cartItemsSelector } from '@/store/modules/product/selectors';
+import { addToCartBunch } from '@/store/modules/product/actions';
+
 const App: NextPage<AppProps> = ({ Component, pageProps }: AppProps) => {
+  const dispatch = useDispatch();
+  const cartItems = useSelector(cartItemsSelector);
+
   useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector<HTMLInputElement>(
@@ -19,6 +26,18 @@ const App: NextPage<AppProps> = ({ Component, pageProps }: AppProps) => {
       jssStyles.parentElement!.removeChild(jssStyles);
     }
   }, []);
+
+  useEffect(() => {
+    let currentOrder = localStorage.getItem("current_order");
+
+    if (currentOrder === null) return;
+    
+    dispatch(addToCartBunch(JSON.parse(currentOrder)))
+  }, [dispatch]);
+
+  useEffect(() => {
+    localStorage.setItem('current_order', JSON.stringify(cartItems))
+  }, [cartItems])
 
   return (
     <>

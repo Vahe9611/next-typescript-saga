@@ -1,7 +1,6 @@
 import { Action } from '@/types/redux';
 import * as types from './types';
 import { ProductsState } from './types';
-import { HYDRATE } from 'next-redux-wrapper';
 
 const initialState: ProductsState = {
   paginationData: {
@@ -19,9 +18,6 @@ const initialState: ProductsState = {
 
 export default function productReducer(state = initialState, action: Action) {
   switch (action.type) {
-    case HYDRATE:
-      return { ...state, ...action.payload.products };
-
     case types.GET_PRODUCTS_REQUEST:
       return {
         ...state,
@@ -59,6 +55,11 @@ export default function productReducer(state = initialState, action: Action) {
       return {
         ...state,
         cartItems: [...state.cartItems, action.payload],
+      };
+    case types.ADD_PRODUCT_TO_CART_BUNCH:
+      return {
+        ...state,
+        cartItems: [...action.payload],
       }
     default:
       return state;

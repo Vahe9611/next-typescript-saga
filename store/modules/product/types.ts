@@ -10,6 +10,7 @@ export const GET_PRODUCT_ITEM_SUCCESS = 'GET_PRODUCT_ITEM_SUCCESS';
 export const GET_PRODUCT_ITEM_FAILURE = 'GET_PRODUCT_ITEM_FAILURE';
 
 export const ADD_PRODUCT_TO_CART = 'ADD_PRODUCT_TO_CART';
+export const ADD_PRODUCT_TO_CART_BUNCH = 'ADD_PRODUCT_TO_CART_BUNCH';
 
 export type ProductsState = {
   paginationData: PaginationResponse;

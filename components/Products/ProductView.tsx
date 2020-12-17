@@ -13,6 +13,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import { productView as productViewStyles } from './styles';
 import { useDispatch } from 'react-redux';
+import { Dispatch } from 'redux'
 import { addToCart } from '@/store/modules/product/actions';
 
 export interface ProductViewProps {
@@ -22,18 +23,29 @@ export interface ProductViewProps {
 const ProductView: React.FC<ProductViewProps> = ({ data }) => {
   const classes = baseStyles();
   const productStyles = productViewStyles();
-  const dispatch = useDispatch();
-  const [selectedSize, setSelectedSize] = useState<null | string | number>(
-    null,
-  );
+  const dispatch: Dispatch = useDispatch();
+  const [selectedSize, setSelectedSize] = useState<string>('Small');
 
   const onSelectSize = useCallback((_, value: string) => {
     setSelectedSize(value);
   }, []);
 
   const handleAddToCart = useCallback(() => {
-    dispatch(addToCart(data));
-  }, [dispatch, data]);
+    const currentOrder = localStorage.getItem("current_order");
+    const cartItem: Product = {
+      ...data,
+      size: selectedSize,
+    } 
+
+    if (currentOrder === null) {
+      localStorage.setItem('current_order', JSON.stringify([cartItem]))
+    }else {
+      localStorage.setItem('current_order', JSON.stringify([...JSON.parse(currentOrder), cartItem]))
+    }
+
+    dispatch(addToCart(cartItem));
+  }, [dispatch, data, selectedSize]);
+
 
   return (
     <Grid container spacing={2}>
@@ -51,7 +63,7 @@ const ProductView: React.FC<ProductViewProps> = ({ data }) => {
         </div>
         <div className={productStyles.sizes}>
           <FormControl component='fieldset'>
-            <FormLabel component='legend'>Gender</FormLabel>
+            <FormLabel component='legend'>Size</FormLabel>
             <RadioGroup
               row={true}
               aria-label='gender'

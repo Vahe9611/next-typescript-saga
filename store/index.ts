@@ -1,5 +1,5 @@
 import { applyMiddleware, createStore, Middleware, StoreEnhancer } from 'redux';
-import { createWrapper, MakeStore } from 'next-redux-wrapper';
+import { createWrapper, MakeStore, HYDRATE } from 'next-redux-wrapper';
 import createSagaMiddleware from 'redux-saga';
 import { RootStateOrAny } from 'react-redux';
 
@@ -15,10 +15,25 @@ const bindMiddleware = (middleware: Middleware[]): StoreEnhancer => {
   return applyMiddleware(...middleware);
 };
 
+const reducer = (state:any, action:any) => {
+  if (action.type === HYDRATE) {
+    const nextState = {
+      ...state, // use previous state
+      ...action.payload, // apply delta from hydration
+    }
+    
+    if (state.products.cartItems) nextState.products.cartItems = state.products.cartItems;
+    
+    return nextState
+  } else {
+    return rootReducer(state, action);
+  }
+}
+
 export const makeStore: MakeStore<AppState> = () => {
   const sagaMiddleware = createSagaMiddleware();
 
-  const store: RootStateOrAny = createStore(rootReducer, bindMiddleware([sagaMiddleware]));
+  const store: RootStateOrAny = createStore(reducer, bindMiddleware([sagaMiddleware]));
 
   store.sagaTask = sagaMiddleware.run(rootSaga);
 
